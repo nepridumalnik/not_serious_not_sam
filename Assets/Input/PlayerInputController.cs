@@ -28,15 +28,6 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
             ""id"": ""b751eefe-f76f-42f5-8bf2-10e834accea6"",
             ""actions"": [
                 {
-                    ""name"": ""Jump"",
-                    ""type"": ""Button"",
-                    ""id"": ""15522f07-9c6b-418e-b8e0-4d189e5798b9"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": ""Press"",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""Move"",
                     ""type"": ""Value"",
                     ""id"": ""b982dca5-c4b4-406c-855e-a55ca5f1bc1e"",
@@ -44,6 +35,15 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""8a722964-9eb8-4385-b8d0-54049a45aafb"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 },
                 {
                     ""name"": ""Look"",
@@ -55,9 +55,45 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""Scroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""c6dd7f37-3bf3-4d48-8f87-9986b5fa3301"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""15522f07-9c6b-418e-b8e0-4d189e5798b9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Reload"",
+                    ""type"": ""Button"",
+                    ""id"": ""1017f100-6fca-488d-a6b3-2c0c04711b3c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Crouch"",
                     ""type"": ""Button"",
                     ""id"": ""fbfa8fb1-46a0-4fed-97e4-625654454cb5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""4592f69c-089f-45ed-8f91-e63e2b94a1b2"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -89,42 +125,6 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Reload"",
-                    ""type"": ""Button"",
-                    ""id"": ""1017f100-6fca-488d-a6b3-2c0c04711b3c"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Run"",
-                    ""type"": ""Button"",
-                    ""id"": ""8a722964-9eb8-4385-b8d0-54049a45aafb"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Interact"",
-                    ""type"": ""Button"",
-                    ""id"": ""4592f69c-089f-45ed-8f91-e63e2b94a1b2"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Scroll"",
-                    ""type"": ""Value"",
-                    ""id"": ""c6dd7f37-3bf3-4d48-8f87-9986b5fa3301"",
-                    ""expectedControlType"": ""Axis"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -317,17 +317,17 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
 }");
         // PlayerInput
         m_PlayerInput = asset.FindActionMap("PlayerInput", throwIfNotFound: true);
-        m_PlayerInput_Jump = m_PlayerInput.FindAction("Jump", throwIfNotFound: true);
         m_PlayerInput_Move = m_PlayerInput.FindAction("Move", throwIfNotFound: true);
+        m_PlayerInput_Run = m_PlayerInput.FindAction("Run", throwIfNotFound: true);
         m_PlayerInput_Look = m_PlayerInput.FindAction("Look", throwIfNotFound: true);
+        m_PlayerInput_Scroll = m_PlayerInput.FindAction("Scroll", throwIfNotFound: true);
+        m_PlayerInput_Jump = m_PlayerInput.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerInput_Reload = m_PlayerInput.FindAction("Reload", throwIfNotFound: true);
         m_PlayerInput_Crouch = m_PlayerInput.FindAction("Crouch", throwIfNotFound: true);
+        m_PlayerInput_Interact = m_PlayerInput.FindAction("Interact", throwIfNotFound: true);
         m_PlayerInput_Fire = m_PlayerInput.FindAction("Fire", throwIfNotFound: true);
         m_PlayerInput_AlternateFire = m_PlayerInput.FindAction("AlternateFire", throwIfNotFound: true);
         m_PlayerInput_SecondaryFire = m_PlayerInput.FindAction("SecondaryFire", throwIfNotFound: true);
-        m_PlayerInput_Reload = m_PlayerInput.FindAction("Reload", throwIfNotFound: true);
-        m_PlayerInput_Run = m_PlayerInput.FindAction("Run", throwIfNotFound: true);
-        m_PlayerInput_Interact = m_PlayerInput.FindAction("Interact", throwIfNotFound: true);
-        m_PlayerInput_Scroll = m_PlayerInput.FindAction("Scroll", throwIfNotFound: true);
     }
 
     ~@PlayerInputController()
@@ -394,32 +394,32 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
     // PlayerInput
     private readonly InputActionMap m_PlayerInput;
     private List<IPlayerInputActions> m_PlayerInputActionsCallbackInterfaces = new List<IPlayerInputActions>();
-    private readonly InputAction m_PlayerInput_Jump;
     private readonly InputAction m_PlayerInput_Move;
+    private readonly InputAction m_PlayerInput_Run;
     private readonly InputAction m_PlayerInput_Look;
+    private readonly InputAction m_PlayerInput_Scroll;
+    private readonly InputAction m_PlayerInput_Jump;
+    private readonly InputAction m_PlayerInput_Reload;
     private readonly InputAction m_PlayerInput_Crouch;
+    private readonly InputAction m_PlayerInput_Interact;
     private readonly InputAction m_PlayerInput_Fire;
     private readonly InputAction m_PlayerInput_AlternateFire;
     private readonly InputAction m_PlayerInput_SecondaryFire;
-    private readonly InputAction m_PlayerInput_Reload;
-    private readonly InputAction m_PlayerInput_Run;
-    private readonly InputAction m_PlayerInput_Interact;
-    private readonly InputAction m_PlayerInput_Scroll;
     public struct PlayerInputActions
     {
         private @PlayerInputController m_Wrapper;
         public PlayerInputActions(@PlayerInputController wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Jump => m_Wrapper.m_PlayerInput_Jump;
         public InputAction @Move => m_Wrapper.m_PlayerInput_Move;
+        public InputAction @Run => m_Wrapper.m_PlayerInput_Run;
         public InputAction @Look => m_Wrapper.m_PlayerInput_Look;
+        public InputAction @Scroll => m_Wrapper.m_PlayerInput_Scroll;
+        public InputAction @Jump => m_Wrapper.m_PlayerInput_Jump;
+        public InputAction @Reload => m_Wrapper.m_PlayerInput_Reload;
         public InputAction @Crouch => m_Wrapper.m_PlayerInput_Crouch;
+        public InputAction @Interact => m_Wrapper.m_PlayerInput_Interact;
         public InputAction @Fire => m_Wrapper.m_PlayerInput_Fire;
         public InputAction @AlternateFire => m_Wrapper.m_PlayerInput_AlternateFire;
         public InputAction @SecondaryFire => m_Wrapper.m_PlayerInput_SecondaryFire;
-        public InputAction @Reload => m_Wrapper.m_PlayerInput_Reload;
-        public InputAction @Run => m_Wrapper.m_PlayerInput_Run;
-        public InputAction @Interact => m_Wrapper.m_PlayerInput_Interact;
-        public InputAction @Scroll => m_Wrapper.m_PlayerInput_Scroll;
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -429,18 +429,30 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
         {
             if (instance == null || m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Add(instance);
-            @Jump.started += instance.OnJump;
-            @Jump.performed += instance.OnJump;
-            @Jump.canceled += instance.OnJump;
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
+            @Run.started += instance.OnRun;
+            @Run.performed += instance.OnRun;
+            @Run.canceled += instance.OnRun;
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @Scroll.started += instance.OnScroll;
+            @Scroll.performed += instance.OnScroll;
+            @Scroll.canceled += instance.OnScroll;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
+            @Reload.started += instance.OnReload;
+            @Reload.performed += instance.OnReload;
+            @Reload.canceled += instance.OnReload;
             @Crouch.started += instance.OnCrouch;
             @Crouch.performed += instance.OnCrouch;
             @Crouch.canceled += instance.OnCrouch;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
             @Fire.started += instance.OnFire;
             @Fire.performed += instance.OnFire;
             @Fire.canceled += instance.OnFire;
@@ -450,34 +462,34 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
             @SecondaryFire.started += instance.OnSecondaryFire;
             @SecondaryFire.performed += instance.OnSecondaryFire;
             @SecondaryFire.canceled += instance.OnSecondaryFire;
-            @Reload.started += instance.OnReload;
-            @Reload.performed += instance.OnReload;
-            @Reload.canceled += instance.OnReload;
-            @Run.started += instance.OnRun;
-            @Run.performed += instance.OnRun;
-            @Run.canceled += instance.OnRun;
-            @Interact.started += instance.OnInteract;
-            @Interact.performed += instance.OnInteract;
-            @Interact.canceled += instance.OnInteract;
-            @Scroll.started += instance.OnScroll;
-            @Scroll.performed += instance.OnScroll;
-            @Scroll.canceled += instance.OnScroll;
         }
 
         private void UnregisterCallbacks(IPlayerInputActions instance)
         {
-            @Jump.started -= instance.OnJump;
-            @Jump.performed -= instance.OnJump;
-            @Jump.canceled -= instance.OnJump;
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
+            @Run.started -= instance.OnRun;
+            @Run.performed -= instance.OnRun;
+            @Run.canceled -= instance.OnRun;
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @Scroll.started -= instance.OnScroll;
+            @Scroll.performed -= instance.OnScroll;
+            @Scroll.canceled -= instance.OnScroll;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
+            @Reload.started -= instance.OnReload;
+            @Reload.performed -= instance.OnReload;
+            @Reload.canceled -= instance.OnReload;
             @Crouch.started -= instance.OnCrouch;
             @Crouch.performed -= instance.OnCrouch;
             @Crouch.canceled -= instance.OnCrouch;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
             @Fire.started -= instance.OnFire;
             @Fire.performed -= instance.OnFire;
             @Fire.canceled -= instance.OnFire;
@@ -487,18 +499,6 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
             @SecondaryFire.started -= instance.OnSecondaryFire;
             @SecondaryFire.performed -= instance.OnSecondaryFire;
             @SecondaryFire.canceled -= instance.OnSecondaryFire;
-            @Reload.started -= instance.OnReload;
-            @Reload.performed -= instance.OnReload;
-            @Reload.canceled -= instance.OnReload;
-            @Run.started -= instance.OnRun;
-            @Run.performed -= instance.OnRun;
-            @Run.canceled -= instance.OnRun;
-            @Interact.started -= instance.OnInteract;
-            @Interact.performed -= instance.OnInteract;
-            @Interact.canceled -= instance.OnInteract;
-            @Scroll.started -= instance.OnScroll;
-            @Scroll.performed -= instance.OnScroll;
-            @Scroll.canceled -= instance.OnScroll;
         }
 
         public void RemoveCallbacks(IPlayerInputActions instance)
@@ -527,16 +527,16 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
     }
     public interface IPlayerInputActions
     {
-        void OnJump(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
+        void OnRun(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnScroll(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
+        void OnReload(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
         void OnAlternateFire(InputAction.CallbackContext context);
         void OnSecondaryFire(InputAction.CallbackContext context);
-        void OnReload(InputAction.CallbackContext context);
-        void OnRun(InputAction.CallbackContext context);
-        void OnInteract(InputAction.CallbackContext context);
-        void OnScroll(InputAction.CallbackContext context);
     }
 }
