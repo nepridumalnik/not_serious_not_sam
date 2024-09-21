@@ -25,6 +25,16 @@ public abstract class AbstractPlayerController : MonoBehaviour
         m_controller.PlayerInput.Look.canceled += OnLook;
         m_controller.PlayerInput.Interact.performed += OnInteract;
         m_controller.PlayerInput.Interact.canceled += OnInteract;
+        m_controller.PlayerInput.Interact.performed += OnInteract;
+        m_controller.PlayerInput.Interact.canceled += OnInteract;
+        m_controller.PlayerInput.Fire.performed += OnFire;
+        m_controller.PlayerInput.Fire.performed += OnFire;
+        m_controller.PlayerInput.SecondaryFire.canceled += OnSecondaryFire;
+        m_controller.PlayerInput.SecondaryFire.canceled += OnSecondaryFire;
+        m_controller.PlayerInput.AlternateFire.performed += OnAlternateFire;
+        m_controller.PlayerInput.AlternateFire.canceled += OnAlternateFire;
+        m_controller.PlayerInput.Scroll.performed += OnScroll;
+        m_controller.PlayerInput.Scroll.canceled += OnScroll;
 
         m_controller.Enable();
     }
@@ -43,6 +53,14 @@ public abstract class AbstractPlayerController : MonoBehaviour
         m_controller.PlayerInput.Look.canceled -= OnLook;
         m_controller.PlayerInput.Interact.performed -= OnInteract;
         m_controller.PlayerInput.Interact.canceled -= OnInteract;
+        m_controller.PlayerInput.Fire.performed -= OnFire;
+        m_controller.PlayerInput.Fire.performed -= OnFire;
+        m_controller.PlayerInput.SecondaryFire.canceled -= OnSecondaryFire;
+        m_controller.PlayerInput.SecondaryFire.canceled -= OnSecondaryFire;
+        m_controller.PlayerInput.AlternateFire.performed -= OnAlternateFire;
+        m_controller.PlayerInput.AlternateFire.canceled -= OnAlternateFire;
+        m_controller.PlayerInput.Scroll.performed -= OnScroll;
+        m_controller.PlayerInput.Scroll.canceled -= OnScroll;
 
         m_controller.Disable();
     }
@@ -54,4 +72,8 @@ public abstract class AbstractPlayerController : MonoBehaviour
     abstract protected void OnReload(InputAction.CallbackContext context);
     abstract protected void OnRun(InputAction.CallbackContext context);
     abstract protected void OnInteract(InputAction.CallbackContext context);
+    abstract protected void OnFire(InputAction.CallbackContext context);
+    abstract protected void OnSecondaryFire(InputAction.CallbackContext context);
+    abstract protected void OnAlternateFire(InputAction.CallbackContext context);
+    abstract protected void OnScroll(InputAction.CallbackContext context);
 }

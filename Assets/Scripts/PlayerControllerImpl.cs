@@ -24,6 +24,26 @@ public class PlayerControllerImpl : AbstractPlayerController
         Debug.Log("OnJump: " + context.ToString());
     }
 
+    protected override void OnFire(InputAction.CallbackContext context)
+    {
+        Debug.Log("OnFire: " + context.ToString());
+    }
+
+    protected override void OnSecondaryFire(InputAction.CallbackContext context)
+    {
+        Debug.Log("OnSecondaryFire: " + context.ToString());
+    }
+
+    protected override void OnAlternateFire(InputAction.CallbackContext context)
+    {
+        Debug.Log("OnAlternateFire: " + context.ToString());
+    }
+
+    protected override void OnScroll(InputAction.CallbackContext context)
+    {
+        Debug.Log("OnScroll: " + context.ToString());
+    }
+
     protected override void OnLook(InputAction.CallbackContext context)
     {
         // 2D вектор для представления пространства перемещения мыши
