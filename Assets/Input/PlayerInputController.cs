@@ -46,9 +46,45 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""bea7056d-f6f5-44a8-9a4e-d95fba4ad703"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""Crouch"",
                     ""type"": ""Button"",
                     ""id"": ""fbfa8fb1-46a0-4fed-97e4-625654454cb5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Reload"",
+                    ""type"": ""Button"",
+                    ""id"": ""1017f100-6fca-488d-a6b3-2c0c04711b3c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""8a722964-9eb8-4385-b8d0-54049a45aafb"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""4592f69c-089f-45ed-8f91-e63e2b94a1b2"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -132,6 +168,61 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""59612a68-687d-4511-92c2-fa0310d515ec"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c2cb22ac-0714-407d-9382-d62133e67fc4"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Reload"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a19ce405-18d9-421b-9a95-8354853b2306"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2177a182-790f-41c0-9e1f-ee9fd990968a"",
+                    ""path"": ""<Keyboard>/rightShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6e9556c8-9f37-41d0-ab9b-1aef4c964bd3"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -148,7 +239,11 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
         m_PlayerInput = asset.FindActionMap("PlayerInput", throwIfNotFound: true);
         m_PlayerInput_Jump = m_PlayerInput.FindAction("Jump", throwIfNotFound: true);
         m_PlayerInput_Move = m_PlayerInput.FindAction("Move", throwIfNotFound: true);
+        m_PlayerInput_Look = m_PlayerInput.FindAction("Look", throwIfNotFound: true);
         m_PlayerInput_Crouch = m_PlayerInput.FindAction("Crouch", throwIfNotFound: true);
+        m_PlayerInput_Reload = m_PlayerInput.FindAction("Reload", throwIfNotFound: true);
+        m_PlayerInput_Run = m_PlayerInput.FindAction("Run", throwIfNotFound: true);
+        m_PlayerInput_Interact = m_PlayerInput.FindAction("Interact", throwIfNotFound: true);
     }
 
     ~@PlayerInputController()
@@ -217,14 +312,22 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
     private List<IPlayerInputActions> m_PlayerInputActionsCallbackInterfaces = new List<IPlayerInputActions>();
     private readonly InputAction m_PlayerInput_Jump;
     private readonly InputAction m_PlayerInput_Move;
+    private readonly InputAction m_PlayerInput_Look;
     private readonly InputAction m_PlayerInput_Crouch;
+    private readonly InputAction m_PlayerInput_Reload;
+    private readonly InputAction m_PlayerInput_Run;
+    private readonly InputAction m_PlayerInput_Interact;
     public struct PlayerInputActions
     {
         private @PlayerInputController m_Wrapper;
         public PlayerInputActions(@PlayerInputController wrapper) { m_Wrapper = wrapper; }
         public InputAction @Jump => m_Wrapper.m_PlayerInput_Jump;
         public InputAction @Move => m_Wrapper.m_PlayerInput_Move;
+        public InputAction @Look => m_Wrapper.m_PlayerInput_Look;
         public InputAction @Crouch => m_Wrapper.m_PlayerInput_Crouch;
+        public InputAction @Reload => m_Wrapper.m_PlayerInput_Reload;
+        public InputAction @Run => m_Wrapper.m_PlayerInput_Run;
+        public InputAction @Interact => m_Wrapper.m_PlayerInput_Interact;
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -240,9 +343,21 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
+            @Look.started += instance.OnLook;
+            @Look.performed += instance.OnLook;
+            @Look.canceled += instance.OnLook;
             @Crouch.started += instance.OnCrouch;
             @Crouch.performed += instance.OnCrouch;
             @Crouch.canceled += instance.OnCrouch;
+            @Reload.started += instance.OnReload;
+            @Reload.performed += instance.OnReload;
+            @Reload.canceled += instance.OnReload;
+            @Run.started += instance.OnRun;
+            @Run.performed += instance.OnRun;
+            @Run.canceled += instance.OnRun;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
         }
 
         private void UnregisterCallbacks(IPlayerInputActions instance)
@@ -253,9 +368,21 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
+            @Look.started -= instance.OnLook;
+            @Look.performed -= instance.OnLook;
+            @Look.canceled -= instance.OnLook;
             @Crouch.started -= instance.OnCrouch;
             @Crouch.performed -= instance.OnCrouch;
             @Crouch.canceled -= instance.OnCrouch;
+            @Reload.started -= instance.OnReload;
+            @Reload.performed -= instance.OnReload;
+            @Reload.canceled -= instance.OnReload;
+            @Run.started -= instance.OnRun;
+            @Run.performed -= instance.OnRun;
+            @Run.canceled -= instance.OnRun;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
         }
 
         public void RemoveCallbacks(IPlayerInputActions instance)
@@ -286,6 +413,10 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
     {
         void OnJump(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
+        void OnReload(InputAction.CallbackContext context);
+        void OnRun(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
     }
 }
