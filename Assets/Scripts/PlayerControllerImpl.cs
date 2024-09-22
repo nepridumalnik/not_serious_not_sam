@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerControllerImpl : AbstractPlayerController
 {
     public float jumpForce = 5f;
+    public float decelerationTime = 0.2f;
     public float moveSpeed = 10f;
     public float runMultiplier = 1.5f;
     public float mouseSensitivity = 1f;
@@ -179,24 +180,27 @@ public class PlayerControllerImpl : AbstractPlayerController
             return;
         }
 
-        // Получаем направление вперед и вправо камеры
         Vector3 forward = playerCamera.transform.forward;
         Vector3 right = playerCamera.transform.right;
 
-        // Убираем вертикальную компоненту, чтобы движение было только по горизонтали
         forward.y = 0;
         right.y = 0;
 
         float speed = !m_isRun ? moveSpeed : moveSpeed * runMultiplier;
 
-        // Нормализуем векторы
         forward.Normalize();
         right.Normalize();
 
-        // Применяем скорость на основе ввода
-        Vector3 linearVelocity = (forward * m_vecSpeed.y + right * m_vecSpeed.x) * speed; // Умножаем на speed для управления скоростью
-
-        // Устанавливаем скорость Rigidbody
-        m_rigidBody.linearVelocity = linearVelocity;
+        // Если скорость ввода обнулилась, то начинаем тормозить
+        if (m_vecSpeed == Vector2.zero)
+        {
+            m_rigidBody.linearVelocity = Vector3.Lerp(m_rigidBody.linearVelocity, Vector3.zero, Time.fixedDeltaTime / decelerationTime);
+        }
+        else
+        {
+            // Иначе двигаемся с нормальной скоростью
+            Vector3 targetVelocity = (forward * m_vecSpeed.y + right * m_vecSpeed.x) * speed;
+            m_rigidBody.linearVelocity = Vector3.Lerp(m_rigidBody.linearVelocity, targetVelocity, Time.fixedDeltaTime / decelerationTime); ;
+        }
     }
 }
