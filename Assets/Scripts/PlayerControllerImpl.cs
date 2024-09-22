@@ -15,6 +15,11 @@ public class PlayerControllerImpl : AbstractPlayerController
     private Vector2 m_vecSpeed;
     private bool m_isRun = false;
 
+    /// <summary>
+    /// Единственная цель этой переменной - сделать чтобы множитель mouseSensitivity был равен единице в среднем
+    /// </summary>
+    private readonly float m_sensitivityMultiplierConstant = 30f;
+
     protected new void Awake()
     {
         base.Awake();
@@ -54,8 +59,10 @@ public class PlayerControllerImpl : AbstractPlayerController
         // 2D вектор для представления пространства перемещения мыши
         Vector2 lookInput = context.ReadValue<Vector2>();
 
-        float horizontalRotation = lookInput.x * mouseSensitivity;
-        float verticalRotation = -lookInput.y * mouseSensitivity;
+        float sensitivityMultiplier = mouseSensitivity * Time.deltaTime * m_sensitivityMultiplierConstant;
+
+        float horizontalRotation = lookInput.x * sensitivityMultiplier;
+        float verticalRotation = -lookInput.y * sensitivityMultiplier;
 
         // Получаем текущий угол поворота камеры
         Vector3 currentRotation = playerCamera.transform.localEulerAngles;
