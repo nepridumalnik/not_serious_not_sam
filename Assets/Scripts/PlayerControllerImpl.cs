@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerControllerImpl : AbstractPlayerController
 {
+    public float jumpForce = 5f;
     public float moveSpeed = 10f;
     public float runMultiplier = 1.5f;
     public float mouseSensitivity = 1f;
@@ -14,6 +15,12 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     private Vector2 m_vecSpeed;
     private bool m_isRun = false;
+    private bool m_isJumping = false;
+
+    /// <summary>
+    /// Единственная цель этой переменной - сделать чтобы множитель mouseSensitivity был равен единице в среднем
+    /// </summary>
+    private readonly float m_sensitivityMultiplierConstant = 30f;
 
     protected new void Awake()
     {
@@ -26,7 +33,24 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     protected override void OnJump(InputAction.CallbackContext context)
     {
-        Debug.Log("OnJump: " + context.ToString());
+        Debug.Log("context.performed: " + context.performed + ", IsGrounded(): " + IsGrounded());
+
+        // Проверяем, что прыжок был инициирован
+        if (context.performed && IsGrounded())
+        {
+            m_rigidBody.linearVelocity = new Vector3(m_rigidBody.linearVelocity.x, m_rigidBody.transform.up.normalized.y * jumpForce, m_rigidBody.linearVelocity.z);
+            m_isJumping = true;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        m_isJumping = !IsGrounded();
+    }
+
+    private bool IsGrounded()
+    {
+        return Physics.Raycast(transform.position, -m_rigidBody.transform.up, 1.01f);
     }
 
     protected override void OnFire(InputAction.CallbackContext context)
@@ -54,8 +78,10 @@ public class PlayerControllerImpl : AbstractPlayerController
         // 2D вектор для представления пространства перемещения мыши
         Vector2 lookInput = context.ReadValue<Vector2>();
 
-        float horizontalRotation = lookInput.x * mouseSensitivity;
-        float verticalRotation = -lookInput.y * mouseSensitivity;
+        float sensitivityMultiplier = mouseSensitivity * Time.deltaTime * m_sensitivityMultiplierConstant;
+
+        float horizontalRotation = lookInput.x * sensitivityMultiplier;
+        float verticalRotation = -lookInput.y * sensitivityMultiplier;
 
         // Получаем текущий угол поворота камеры
         Vector3 currentRotation = playerCamera.transform.localEulerAngles;
@@ -123,15 +149,12 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         if (context.performed)
         {
-            Debug.Log("OnMove: context.performed");
-
             Vector2 move = context.ReadValue<Vector2>();
             m_vecSpeed.x = move.x;
             m_vecSpeed.y = move.y;
         }
         else if (context.canceled)
         {
-            Debug.Log("OnMove: context.canceled");
             m_vecSpeed = Vector2.zero;
         }
     }
@@ -151,6 +174,11 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     private void Move()
     {
+        if (m_isJumping)
+        {
+            return;
+        }
+
         // Получаем направление вперед и вправо камеры
         Vector3 forward = playerCamera.transform.forward;
         Vector3 right = playerCamera.transform.right;
