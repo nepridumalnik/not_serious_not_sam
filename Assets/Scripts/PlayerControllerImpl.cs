@@ -15,7 +15,7 @@ public class PlayerControllerImpl : AbstractPlayerController
     private Rigidbody m_rigidBody;
 
     private Vector2 m_vecSpeed;
-    private bool m_isRun = false;
+    private bool m_runPressed = false;
     private bool m_isJumping = false;
 
     /// <summary>
@@ -110,7 +110,7 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     protected override void OnRun(InputAction.CallbackContext context)
     {
-        m_isRun = context.performed;
+        m_runPressed = context.performed;
 
         if (context.performed)
         {
@@ -186,7 +186,7 @@ public class PlayerControllerImpl : AbstractPlayerController
         forward.y = 0;
         right.y = 0;
 
-        float speed = !m_isRun ? moveSpeed : moveSpeed * runMultiplier;
+        float speed = IsRunning() ? moveSpeed * runMultiplier : moveSpeed;
 
         forward.Normalize();
         right.Normalize();
@@ -202,5 +202,16 @@ public class PlayerControllerImpl : AbstractPlayerController
             Vector3 targetVelocity = (forward * m_vecSpeed.y + right * m_vecSpeed.x) * speed;
             m_rigidBody.linearVelocity = Vector3.Lerp(m_rigidBody.linearVelocity, targetVelocity, Time.fixedDeltaTime / decelerationTime); ;
         }
+    }
+
+    private bool IsRunning()
+    {
+        // Критерий успеха - если вертикальная составляющая равна нулю и больше или равна горизонтальной
+        if (!m_runPressed)
+        {
+            return false;
+        }
+
+        return m_vecSpeed.y > 0 && m_vecSpeed.y >= m_vecSpeed.x;
     }
 }
