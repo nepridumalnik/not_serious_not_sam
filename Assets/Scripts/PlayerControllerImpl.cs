@@ -51,7 +51,7 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     private bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -m_rigidBody.transform.up, 1.01f);
+        return Physics.Raycast(m_rigidBody.transform.position, -m_rigidBody.transform.up, 1.01f);
     }
 
     protected override void OnFire(InputAction.CallbackContext context)
