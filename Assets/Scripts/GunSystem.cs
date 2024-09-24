@@ -60,7 +60,7 @@ public class GunSystem : MonoBehaviour
         }
 
         m_reloading = true;
-        Invoke("ReloadFinished", reloadTimeout);
+        Invoke(nameof(ReloadFinished), reloadTimeout);
     }
 
     private void ReloadFinished()
@@ -111,7 +111,7 @@ public class GunSystem : MonoBehaviour
             Shoot();
         }
 
-        Invoke("ResetShot", shootingDelay);
+        Invoke(nameof(ResetShot), shootingDelay);
     }
 
     private void ResetShot()
