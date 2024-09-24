@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerControllerImpl : AbstractPlayerController
 {
     public float jumpForce = 5f;
+    public float decelerationTime = 0.2f;
     public float moveSpeed = 10f;
     public float runMultiplier = 1.5f;
     public float mouseSensitivity = 1f;
@@ -14,8 +15,10 @@ public class PlayerControllerImpl : AbstractPlayerController
     private Rigidbody m_rigidBody;
 
     private Vector2 m_vecSpeed;
-    private bool m_isRun = false;
+    private bool m_runPressed = false;
     private bool m_isJumping = false;
+
+    private GunSystem m_gun;
 
     /// <summary>
     /// Единственная цель этой переменной - сделать чтобы множитель mouseSensitivity был равен единице в среднем
@@ -26,6 +29,9 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         base.Awake();
 
+        m_gun = gameObject.AddComponent<GunSystem>();
+        m_gun.fpsCamera = playerCamera;
+
         m_vecSpeed = Vector2.zero;
         m_rigidBody = GetComponent<Rigidbody>();
         playerCamera.transform.localRotation = m_rigidBody.transform.localRotation;
@@ -33,7 +39,7 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     protected override void OnJump(InputAction.CallbackContext context)
     {
-        Debug.Log("context.performed: " + context.performed + ", IsGrounded(): " + IsGrounded());
+        // Debug("context.performed: " + context.performed + ", IsGrounded(): " + IsGrounded());
 
         // Проверяем, что прыжок был инициирован
         if (context.performed && IsGrounded())
@@ -50,27 +56,36 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     private bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -m_rigidBody.transform.up, 1.01f);
+        return Physics.Raycast(m_rigidBody.transform.position, -m_rigidBody.transform.up, 1.01f);
     }
 
     protected override void OnFire(InputAction.CallbackContext context)
     {
-        Debug.Log("OnFire: " + context.ToString());
+        // Debug("OnFire: " + context.ToString());
+
+        if (context.performed)
+        {
+            m_gun.PullTrigger();
+        }
+        else if (context.canceled)
+        {
+            m_gun.ReleaseTrigger();
+        }
     }
 
     protected override void OnSecondaryFire(InputAction.CallbackContext context)
     {
-        Debug.Log("OnSecondaryFire: " + context.ToString());
+        // Debug("OnSecondaryFire: " + context.ToString());
     }
 
     protected override void OnAlternateFire(InputAction.CallbackContext context)
     {
-        Debug.Log("OnAlternateFire: " + context.ToString());
+        // Debug("OnAlternateFire: " + context.ToString());
     }
 
     protected override void OnScroll(InputAction.CallbackContext context)
     {
-        Debug.Log("OnScroll: " + context.ToString());
+        // Debug("OnScroll: " + context.ToString());
     }
 
     protected override void OnLook(InputAction.CallbackContext context)
@@ -105,19 +120,23 @@ public class PlayerControllerImpl : AbstractPlayerController
     protected override void OnReload(InputAction.CallbackContext context)
     {
         Debug.Log("OnReload: " + context.ToString());
+        if (context.performed)
+        {
+            m_gun.Reload();
+        }
     }
 
     protected override void OnRun(InputAction.CallbackContext context)
     {
-        m_isRun = context.performed;
+        m_runPressed = context.performed;
 
         if (context.performed)
         {
-            Debug.Log("OnRun: context.performed");
+            // Debug("OnRun: context.performed");
         }
         else if (context.canceled)
         {
-            Debug.Log("OnRun: context.canceled");
+            // Debug("OnRun: context.canceled");
         }
     }
 
@@ -125,11 +144,11 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         if (context.performed)
         {
-            Debug.Log("OnInteract: context.performed");
+            // Debug("OnInteract: context.performed");
         }
         else if (context.canceled)
         {
-            Debug.Log("OnInteract: context.canceled");
+            // Debug("OnInteract: context.canceled");
         }
     }
 
@@ -137,11 +156,11 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         if (context.performed)
         {
-            Debug.Log("OnCrouch: context.performed");
+            // Debug("OnCrouch: context.performed");
         }
         else if (context.canceled)
         {
-            Debug.Log("OnCrouch: context.canceled");
+            // Debug("OnCrouch: context.canceled");
         }
     }
 
@@ -179,24 +198,38 @@ public class PlayerControllerImpl : AbstractPlayerController
             return;
         }
 
-        // Получаем направление вперед и вправо камеры
         Vector3 forward = playerCamera.transform.forward;
         Vector3 right = playerCamera.transform.right;
 
-        // Убираем вертикальную компоненту, чтобы движение было только по горизонтали
         forward.y = 0;
         right.y = 0;
 
-        float speed = !m_isRun ? moveSpeed : moveSpeed * runMultiplier;
+        float speed = IsRunning() ? moveSpeed * runMultiplier : moveSpeed;
 
-        // Нормализуем векторы
         forward.Normalize();
         right.Normalize();
 
-        // Применяем скорость на основе ввода
-        Vector3 linearVelocity = (forward * m_vecSpeed.y + right * m_vecSpeed.x) * speed; // Умножаем на speed для управления скоростью
+        // Если скорость ввода обнулилась, то начинаем тормозить
+        if (m_vecSpeed == Vector2.zero)
+        {
+            m_rigidBody.linearVelocity = Vector3.Lerp(m_rigidBody.linearVelocity, Vector3.zero, Time.fixedDeltaTime / decelerationTime);
+        }
+        else
+        {
+            // Иначе двигаемся с нормальной скоростью
+            Vector3 targetVelocity = (forward * m_vecSpeed.y + right * m_vecSpeed.x) * speed;
+            m_rigidBody.linearVelocity = Vector3.Lerp(m_rigidBody.linearVelocity, targetVelocity, Time.fixedDeltaTime / decelerationTime); ;
+        }
+    }
 
-        // Устанавливаем скорость Rigidbody
-        m_rigidBody.linearVelocity = linearVelocity;
+    private bool IsRunning()
+    {
+        // Критерий успеха - если вертикальная составляющая равна нулю и больше или равна горизонтальной
+        if (!m_runPressed)
+        {
+            return false;
+        }
+
+        return m_vecSpeed.y > 0 && m_vecSpeed.y >= m_vecSpeed.x;
     }
 }
