@@ -13,7 +13,7 @@ public class GunSystem : MonoBehaviour
     // Floats
     public float shootingDelay = 0.1f;
     public float spread = 0.1f;
-    public float range = 100f;
+    public float range = 1000f;
     public float reloadTimeout = 1f;
 
     // Bools
@@ -27,17 +27,21 @@ public class GunSystem : MonoBehaviour
     private bool m_shooting = false;
     private bool m_triggerHold = false;
     private bool m_triggerJustPressed = false;
-    private bool m_readyToShot = false;
+    private bool m_readyToShot = true;
     private bool m_reloading = false;
 
     // References
     public Camera fpsCamera;
     public Transform attackPoint;
     public RaycastHit rcHit;
-    public LayerMask whatHited;
 
     // Methods
-    public void PressTrigger()
+    private void Start()
+    {
+        m_remainedBullets = magazineSize;
+    }
+
+    public void PullTrigger()
     {
         m_triggerHold = true;
         m_triggerJustPressed = true;
@@ -50,11 +54,12 @@ public class GunSystem : MonoBehaviour
 
     public void Reload()
     {
+        Debug.Log($"{nameof(Reload)}, m_reloading {m_reloading} bullets, m_remainedBullets: {m_remainedBullets}, magazineSize: {magazineSize}");
         if (m_reloading)
         {
             return;
         }
-        if (m_remainedBullets < magazineSize)
+        if (!(m_remainedBullets < magazineSize))
         {
             return;
         }
@@ -67,25 +72,39 @@ public class GunSystem : MonoBehaviour
     {
         m_remainedBullets = magazineSize;
         m_reloading = false;
+        Debug.Log($"ReloadFinished, remains {m_remainedBullets} bullets");
     }
 
     private void Shoot()
     {
-        // Применяем разброс
-        float x = Random.Range(-spread, spread);
-        float y = Random.Range(-spread, spread);
-        Vector3 raycastDirection = fpsCamera.transform.forward + new Vector3(x, y, 0);
-
-        if (Physics.Raycast(fpsCamera.transform.position, raycastDirection, out RaycastHit hitInfo, range, whatHited))
+        try
         {
-            Debug.Log("Hited was: " + hitInfo);
+            // Применяем разброс
+            float x = Random.Range(-spread, spread);
+            float y = Random.Range(-spread, spread);
+            Vector3 raycastDirection = fpsCamera.transform.forward + new Vector3(x, y, 0);
 
-            // TODO: нанести дамагарова
+            if (Physics.Raycast(fpsCamera.transform.position, raycastDirection, out RaycastHit hitInfo, range))
+            {
+                Debug.Log($"distance: {hitInfo.distance}");
+                Debug.DrawLine(fpsCamera.transform.position, hitInfo.point, Color.red, 30f);
+
+                // TODO: нанести дамагарова
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log(e);
         }
     }
 
     private void HandleTriggerPulled()
     {
+        if (!m_readyToShot)
+        {
+            return;
+        }
+
         if (holdAllowed)
         {
             m_shooting = m_triggerHold;
@@ -95,12 +114,12 @@ public class GunSystem : MonoBehaviour
             m_shooting = m_triggerJustPressed;
         }
 
-        m_triggerJustPressed = false;
-
-        if (!m_readyToShot || m_shooting || m_reloading || m_remainedBullets < 1)
+        if (!m_shooting || m_reloading || m_remainedBullets < 1)
         {
             return;
         }
+
+        m_triggerJustPressed = false;
 
         m_readyToShot = false;
         m_remainedBullets--;
@@ -110,6 +129,8 @@ public class GunSystem : MonoBehaviour
         {
             Shoot();
         }
+
+        Debug.Log($"Remains {m_remainedBullets} bullets");
 
         Invoke(nameof(ResetShot), shootingDelay);
     }

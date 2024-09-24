@@ -30,8 +30,8 @@ public abstract class AbstractPlayerController : MonoBehaviour
         m_controller.PlayerInput.Move.performed += OnMove;
         m_controller.PlayerInput.Move.canceled += OnMove;
         m_controller.PlayerInput.Reload.performed += OnReload;
-        m_controller.PlayerInput.Run.performed += OnRun;
         m_controller.PlayerInput.Run.canceled += OnRun;
+        m_controller.PlayerInput.Run.performed += OnRun;
         m_controller.PlayerInput.Look.performed += OnLook;
         m_controller.PlayerInput.Look.canceled += OnLook;
         m_controller.PlayerInput.Interact.performed += OnInteract;
@@ -39,8 +39,8 @@ public abstract class AbstractPlayerController : MonoBehaviour
         m_controller.PlayerInput.Interact.performed += OnInteract;
         m_controller.PlayerInput.Interact.canceled += OnInteract;
         m_controller.PlayerInput.Fire.performed += OnFire;
-        m_controller.PlayerInput.Fire.performed += OnFire;
-        m_controller.PlayerInput.SecondaryFire.canceled += OnSecondaryFire;
+        m_controller.PlayerInput.Fire.canceled += OnFire;
+        m_controller.PlayerInput.SecondaryFire.performed += OnSecondaryFire;
         m_controller.PlayerInput.SecondaryFire.canceled += OnSecondaryFire;
         m_controller.PlayerInput.AlternateFire.performed += OnAlternateFire;
         m_controller.PlayerInput.AlternateFire.canceled += OnAlternateFire;
