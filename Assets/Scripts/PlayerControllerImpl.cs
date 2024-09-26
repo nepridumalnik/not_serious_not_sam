@@ -4,21 +4,13 @@ using UnityEngine.InputSystem;
 
 public class PlayerControllerImpl : AbstractPlayerController
 {
-    public float mouseSensitivity = 1f;
-    public float clampLookMax = 80f;
-    public float clampLookMin = -80f;
-
     public Camera playerCamera = null;
     private Rigidbody m_rigidBody = null;
     private GunSystem m_gun = null;
 
     private CrouchController m_crouchController = null;
     private MoveController m_moveController = null;
-
-    /// <summary>
-    /// Единственная цель этой переменной - сделать чтобы множитель mouseSensitivity был равен единице в среднем
-    /// </summary>
-    private readonly float m_sensitivityMultiplierConstant = 30f;
+    private MouseController m_mouseController = null;
 
     protected new void Awake()
     {
@@ -68,31 +60,7 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     protected override void OnLook(InputAction.CallbackContext context)
     {
-        // 2D вектор для представления пространства перемещения мыши
-        Vector2 lookInput = context.ReadValue<Vector2>();
-
-        float sensitivityMultiplier = mouseSensitivity * Time.deltaTime * m_sensitivityMultiplierConstant;
-
-        float horizontalRotation = lookInput.x * sensitivityMultiplier;
-        float verticalRotation = -lookInput.y * sensitivityMultiplier;
-
-        // Получаем текущий угол поворота камеры
-        Vector3 currentRotation = playerCamera.transform.localEulerAngles;
-
-        // Преобразуем угол в диапазон [-180, 180] для корректной работы с ограничениями
-        if (currentRotation.x > 180)
-        {
-            currentRotation.x -= 360;
-        }
-
-        // Добавляем горизонтальный поворот (без ограничений)
-        currentRotation.y += horizontalRotation;
-
-        // Добавляем вертикальный поворот с ограничением по углам
-        currentRotation.x = Mathf.Clamp(currentRotation.x + verticalRotation, clampLookMin, clampLookMax);
-
-        // Применяем новый угол поворота
-        playerCamera.transform.localRotation = Quaternion.Euler(currentRotation.x, currentRotation.y, currentRotation.z);
+        m_mouseController.OnLook(context.ReadValue<Vector2>());
     }
 
     protected override void OnReload(InputAction.CallbackContext context)
@@ -164,6 +132,7 @@ public class PlayerControllerImpl : AbstractPlayerController
 
         m_crouchController = CrouchController.AddToGameObject(gameObject, GetComponent<CapsuleCollider>());
         m_moveController = MoveController.AddToGameObject(gameObject, m_crouchController, playerCamera, m_rigidBody);
+        m_mouseController = MouseController.AddToGameObject(gameObject, playerCamera);
     }
 
     void FixedUpdate()
