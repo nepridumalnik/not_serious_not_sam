@@ -19,10 +19,8 @@ public class PlayerControllerImpl : AbstractPlayerController
     private Vector2 m_vecSpeed = Vector2.zero;
     private bool m_runPressed = false;
     private bool m_isJumping = false;
-    private bool m_isCrouching = false;
-    private readonly float m_crouchMax = 2f;
-    private readonly float m_crouchMin = 1.35f;
-    private readonly float m_crouchDuration = 0.3f;
+
+    private CrouchController m_crouchController = null;
 
     /// <summary>
     /// Единственная цель этой переменной - сделать чтобы множитель mouseSensitivity был равен единице в среднем
@@ -32,13 +30,6 @@ public class PlayerControllerImpl : AbstractPlayerController
     protected new void Awake()
     {
         base.Awake();
-
-        m_gun = gameObject.AddComponent<GunSystem>();
-        m_gun.fpsCamera = playerCamera;
-
-        m_vecSpeed = Vector2.zero;
-        m_rigidBody = GetComponent<Rigidbody>();
-        playerCamera.transform.localRotation = m_rigidBody.transform.localRotation;
     }
 
     protected override void OnJump(InputAction.CallbackContext context)
@@ -156,53 +147,11 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         if (context.performed)
         {
-            SitDown();
+            m_crouchController.SitDown();
         }
         else if (context.canceled)
         {
-            AntiSitDown();
-        }
-    }
-
-    private void SitDown()
-    {
-        CapsuleCollider collider = GetComponent<CapsuleCollider>();
-        m_isCrouching = true;
-        StartCoroutine(ChangeHeightCoroutine(collider, collider.height, m_crouchMin, m_crouchDuration));
-    }
-
-    private void AntiSitDown()
-    {
-        CapsuleCollider collider = GetComponent<CapsuleCollider>();
-        m_isCrouching = false;
-        StartCoroutine(ChangeHeightCoroutine(collider, collider.height, m_crouchMax, m_crouchDuration));
-    }
-
-    private IEnumerator ChangeHeightCoroutine(CapsuleCollider collider, float startHeight, float targetHeight, float duration)
-    {
-        bool currentCrouchState = m_isCrouching;
-        float elapsedTime = 0f;
-
-        while (elapsedTime < duration && m_isCrouching == currentCrouchState)
-        {
-            if (m_isCrouching != currentCrouchState)
-            {
-                break;
-            }
-
-            // Линейная интерполяция между начальной и целевой высотой
-            collider.height = Mathf.Lerp(startHeight, targetHeight, elapsedTime / duration);
-            elapsedTime += Time.deltaTime;
-
-            // Ждем следующий кадр
-            yield return null;
-        }
-
-
-        if (m_isCrouching != currentCrouchState)
-        {
-            // Убедиться, что после завершения анимации высота точно соответствует целевой
-            collider.height = targetHeight;
+            m_crouchController.AntiSitDown();
         }
     }
 
@@ -222,6 +171,16 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     void Start()
     {
+        m_gun = gameObject.AddComponent<GunSystem>();
+        m_gun.fpsCamera = playerCamera;
+
+        m_vecSpeed = Vector2.zero;
+
+        m_rigidBody = GetComponent<Rigidbody>();
+        playerCamera.transform.localRotation = m_rigidBody.transform.localRotation;
+
+        m_crouchController = gameObject.AddComponent<CrouchController>();
+        m_crouchController.Collider = GetComponent<CapsuleCollider>();
     }
 
     void FixedUpdate()
@@ -267,7 +226,7 @@ public class PlayerControllerImpl : AbstractPlayerController
     private bool IsRunning()
     {
         // Критерий успеха - если вертикальная составляющая равна нулю и больше или равна горизонтальной
-        if (!m_runPressed || m_isCrouching)
+        if (!m_runPressed || m_crouchController.IsCrouching())
         {
             return false;
         }
