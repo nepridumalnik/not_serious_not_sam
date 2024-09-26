@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,14 +12,17 @@ public class PlayerControllerImpl : AbstractPlayerController
     public float clampLookMax = 80f;
     public float clampLookMin = -80f;
 
-    public Camera playerCamera;
-    private Rigidbody m_rigidBody;
+    public Camera playerCamera = null;
+    private Rigidbody m_rigidBody = null;
+    private GunSystem m_gun = null;
 
-    private Vector2 m_vecSpeed;
+    private Vector2 m_vecSpeed = Vector2.zero;
     private bool m_runPressed = false;
     private bool m_isJumping = false;
-
-    private GunSystem m_gun;
+    private bool m_isCrouching = false;
+    private readonly float m_crouchMax = 2f;
+    private readonly float m_crouchMin = 1.35f;
+    private readonly float m_crouchDuration = 0.3f;
 
     /// <summary>
     /// Единственная цель этой переменной - сделать чтобы множитель mouseSensitivity был равен единице в среднем
@@ -39,8 +43,6 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     protected override void OnJump(InputAction.CallbackContext context)
     {
-        // Debug("context.performed: " + context.performed + ", IsGrounded(): " + IsGrounded());
-
         // Проверяем, что прыжок был инициирован
         if (context.performed && IsGrounded())
         {
@@ -61,8 +63,6 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     protected override void OnFire(InputAction.CallbackContext context)
     {
-        // Debug("OnFire: " + context.ToString());
-
         if (context.performed)
         {
             m_gun.PullTrigger();
@@ -75,17 +75,17 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     protected override void OnSecondaryFire(InputAction.CallbackContext context)
     {
-        // Debug("OnSecondaryFire: " + context.ToString());
+        // Debug.Log("OnSecondaryFire: " + context.ToString());
     }
 
     protected override void OnAlternateFire(InputAction.CallbackContext context)
     {
-        // Debug("OnAlternateFire: " + context.ToString());
+        // Debug.Log("OnAlternateFire: " + context.ToString());
     }
 
     protected override void OnScroll(InputAction.CallbackContext context)
     {
-        // Debug("OnScroll: " + context.ToString());
+        // Debug.Log("OnScroll: " + context.ToString());
     }
 
     protected override void OnLook(InputAction.CallbackContext context)
@@ -132,11 +132,11 @@ public class PlayerControllerImpl : AbstractPlayerController
 
         if (context.performed)
         {
-            // Debug("OnRun: context.performed");
+            // Debug.Log("OnRun: context.performed");
         }
         else if (context.canceled)
         {
-            // Debug("OnRun: context.canceled");
+            // Debug.Log("OnRun: context.canceled");
         }
     }
 
@@ -144,11 +144,11 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         if (context.performed)
         {
-            // Debug("OnInteract: context.performed");
+            // Debug.Log("OnInteract: context.performed");
         }
         else if (context.canceled)
         {
-            // Debug("OnInteract: context.canceled");
+            // Debug.Log("OnInteract: context.canceled");
         }
     }
 
@@ -156,11 +156,53 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         if (context.performed)
         {
-            // Debug("OnCrouch: context.performed");
+            SitDown();
         }
         else if (context.canceled)
         {
-            // Debug("OnCrouch: context.canceled");
+            AntiSitDown();
+        }
+    }
+
+    private void SitDown()
+    {
+        CapsuleCollider collider = GetComponent<CapsuleCollider>();
+        m_isCrouching = true;
+        StartCoroutine(ChangeHeightCoroutine(collider, collider.height, m_crouchMin, m_crouchDuration));
+    }
+
+    private void AntiSitDown()
+    {
+        CapsuleCollider collider = GetComponent<CapsuleCollider>();
+        m_isCrouching = false;
+        StartCoroutine(ChangeHeightCoroutine(collider, collider.height, m_crouchMax, m_crouchDuration));
+    }
+
+    private IEnumerator ChangeHeightCoroutine(CapsuleCollider collider, float startHeight, float targetHeight, float duration)
+    {
+        bool currentCrouchState = m_isCrouching;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration && m_isCrouching == currentCrouchState)
+        {
+            if (m_isCrouching != currentCrouchState)
+            {
+                break;
+            }
+
+            // Линейная интерполяция между начальной и целевой высотой
+            collider.height = Mathf.Lerp(startHeight, targetHeight, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+
+            // Ждем следующий кадр
+            yield return null;
+        }
+
+
+        if (m_isCrouching != currentCrouchState)
+        {
+            // Убедиться, что после завершения анимации высота точно соответствует целевой
+            collider.height = targetHeight;
         }
     }
 
@@ -225,7 +267,7 @@ public class PlayerControllerImpl : AbstractPlayerController
     private bool IsRunning()
     {
         // Критерий успеха - если вертикальная составляющая равна нулю и больше или равна горизонтальной
-        if (!m_runPressed)
+        if (!m_runPressed || m_isCrouching)
         {
             return false;
         }
