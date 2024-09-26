@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 public class PlayerControllerImpl : AbstractPlayerController
 {
     public Camera playerCamera = null;
-    private Rigidbody m_rigidBody = null;
     private GunSystem m_gun = null;
 
     private CrouchController m_crouchController = null;
@@ -112,7 +111,6 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         if (context.performed)
         {
-
             Vector2 move = context.ReadValue<Vector2>();
             m_moveController.OnMove(move);
         }
@@ -127,11 +125,11 @@ public class PlayerControllerImpl : AbstractPlayerController
         m_gun = gameObject.AddComponent<GunSystem>();
         m_gun.fpsCamera = playerCamera;
 
-        m_rigidBody = GetComponent<Rigidbody>();
-        playerCamera.transform.localRotation = m_rigidBody.transform.localRotation;
+        var rigidBody = GetComponent<Rigidbody>();
+        playerCamera.transform.localRotation = rigidBody.transform.localRotation;
 
         m_crouchController = CrouchController.AddToGameObject(gameObject, GetComponent<CapsuleCollider>());
-        m_moveController = MoveController.AddToGameObject(gameObject, m_crouchController, playerCamera, m_rigidBody);
+        m_moveController = MoveController.AddToGameObject(gameObject, m_crouchController, playerCamera, rigidBody);
         m_mouseController = MouseController.AddToGameObject(gameObject, playerCamera);
     }
 
