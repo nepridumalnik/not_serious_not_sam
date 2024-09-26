@@ -4,10 +4,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerControllerImpl : AbstractPlayerController
 {
-    public float jumpForce = 5f;
-    public float decelerationTime = 0.2f;
-    public float moveSpeed = 10f;
-    public float runMultiplier = 1.5f;
     public float mouseSensitivity = 1f;
     public float clampLookMax = 80f;
     public float clampLookMin = -80f;
@@ -16,11 +12,8 @@ public class PlayerControllerImpl : AbstractPlayerController
     private Rigidbody m_rigidBody = null;
     private GunSystem m_gun = null;
 
-    private Vector2 m_vecSpeed = Vector2.zero;
-    private bool m_runPressed = false;
-    private bool m_isJumping = false;
-
     private CrouchController m_crouchController = null;
+    private MoveController m_moveController = null;
 
     /// <summary>
     /// Единственная цель этой переменной - сделать чтобы множитель mouseSensitivity был равен единице в среднем
@@ -35,21 +28,15 @@ public class PlayerControllerImpl : AbstractPlayerController
     protected override void OnJump(InputAction.CallbackContext context)
     {
         // Проверяем, что прыжок был инициирован
-        if (context.performed && IsGrounded())
+        if (context.performed)
         {
-            m_rigidBody.linearVelocity = new Vector3(m_rigidBody.linearVelocity.x, m_rigidBody.transform.up.normalized.y * jumpForce, m_rigidBody.linearVelocity.z);
-            m_isJumping = true;
+            m_moveController.OnJump();
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        m_isJumping = !IsGrounded();
-    }
-
-    private bool IsGrounded()
-    {
-        return Physics.Raycast(m_rigidBody.transform.position, -m_rigidBody.transform.up, 1.01f);
+        m_moveController.CheckCollision();
     }
 
     protected override void OnFire(InputAction.CallbackContext context)
@@ -119,15 +106,13 @@ public class PlayerControllerImpl : AbstractPlayerController
 
     protected override void OnRun(InputAction.CallbackContext context)
     {
-        m_runPressed = context.performed;
-
         if (context.performed)
         {
-            // Debug.Log("OnRun: context.performed");
+            m_moveController.Run();
         }
         else if (context.canceled)
         {
-            // Debug.Log("OnRun: context.canceled");
+            m_moveController.UnRun();
         }
     }
 
@@ -159,13 +144,13 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         if (context.performed)
         {
+
             Vector2 move = context.ReadValue<Vector2>();
-            m_vecSpeed.x = move.x;
-            m_vecSpeed.y = move.y;
+            m_moveController.OnMove(move);
         }
         else if (context.canceled)
         {
-            m_vecSpeed = Vector2.zero;
+            m_moveController.OnStop();
         }
     }
 
@@ -174,63 +159,19 @@ public class PlayerControllerImpl : AbstractPlayerController
         m_gun = gameObject.AddComponent<GunSystem>();
         m_gun.fpsCamera = playerCamera;
 
-        m_vecSpeed = Vector2.zero;
-
         m_rigidBody = GetComponent<Rigidbody>();
         playerCamera.transform.localRotation = m_rigidBody.transform.localRotation;
 
-        m_crouchController = gameObject.AddComponent<CrouchController>();
-        m_crouchController.Collider = GetComponent<CapsuleCollider>();
+        m_crouchController = CrouchController.AddToGameObject(gameObject, GetComponent<CapsuleCollider>());
+        m_moveController = MoveController.AddToGameObject(gameObject, m_crouchController, playerCamera, m_rigidBody);
     }
 
     void FixedUpdate()
     {
-        Move();
+        m_moveController.Move();
     }
 
     void Update()
     {
-    }
-
-    private void Move()
-    {
-        if (m_isJumping)
-        {
-            return;
-        }
-
-        Vector3 forward = playerCamera.transform.forward;
-        Vector3 right = playerCamera.transform.right;
-
-        forward.y = 0;
-        right.y = 0;
-
-        float speed = IsRunning() ? moveSpeed * runMultiplier : moveSpeed;
-
-        forward.Normalize();
-        right.Normalize();
-
-        // Если скорость ввода обнулилась, то начинаем тормозить
-        if (m_vecSpeed == Vector2.zero)
-        {
-            m_rigidBody.linearVelocity = Vector3.Lerp(m_rigidBody.linearVelocity, Vector3.zero, Time.fixedDeltaTime / decelerationTime);
-        }
-        else
-        {
-            // Иначе двигаемся с нормальной скоростью
-            Vector3 targetVelocity = (forward * m_vecSpeed.y + right * m_vecSpeed.x) * speed;
-            m_rigidBody.linearVelocity = Vector3.Lerp(m_rigidBody.linearVelocity, targetVelocity, Time.fixedDeltaTime / decelerationTime); ;
-        }
-    }
-
-    private bool IsRunning()
-    {
-        // Критерий успеха - если вертикальная составляющая равна нулю и больше или равна горизонтальной
-        if (!m_runPressed || m_crouchController.IsCrouching())
-        {
-            return false;
-        }
-
-        return m_vecSpeed.y > 0 && m_vecSpeed.y >= m_vecSpeed.x;
     }
 }

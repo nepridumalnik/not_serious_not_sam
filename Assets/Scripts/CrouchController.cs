@@ -8,20 +8,34 @@ public class CrouchController : MonoBehaviour
     private readonly float m_crouchMax = 2f;
     private readonly float m_crouchMin = 1.35f;
     private readonly float m_crouchDuration = 0.3f;
-    private new WeakReference<CapsuleCollider> collider = null;
+    private WeakReference<CapsuleCollider> m_collider = null;
+
+    /// <summary>
+    /// Создать экземпляр правильным способом и сразу добавить на GameObject
+    /// </summary>
+    /// <param name="gameObject">Родительский GameObject</param>
+    /// <param name="collider">Родительский CapsuleCollider</param>
+    /// <returns></returns>
+    public static CrouchController AddToGameObject(GameObject gameObject, CapsuleCollider collider)
+    {
+        var crouchController = gameObject.AddComponent<CrouchController>();
+        crouchController.Collider = collider;
+
+        return crouchController;
+    }
 
     public CapsuleCollider Collider
     {
         set
         {
-            collider = new WeakReference<CapsuleCollider>(value);
+            m_collider = new WeakReference<CapsuleCollider>(value);
         }
     }
 
     public void SitDown()
     {
         m_isCrouching = true;
-        if (collider.TryGetTarget(out CapsuleCollider target))
+        if (m_collider.TryGetTarget(out var target))
         {
             StartCoroutine(ChangeHeightCoroutine(target, target.height, m_crouchMin));
         }
@@ -31,7 +45,7 @@ public class CrouchController : MonoBehaviour
     {
         m_isCrouching = false;
 
-        if (collider.TryGetTarget(out CapsuleCollider target))
+        if (m_collider.TryGetTarget(out var target))
         {
             StartCoroutine(ChangeHeightCoroutine(target, target.height, m_crouchMax));
         }
