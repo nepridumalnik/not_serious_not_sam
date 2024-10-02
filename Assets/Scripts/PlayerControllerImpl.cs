@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerControllerImpl : AbstractPlayerController
 {
+    public float grenadeThrowForce = 20.0f;
     public Camera playerCamera = null;
     private GunSystem m_gun = null;
 
@@ -56,6 +57,30 @@ public class PlayerControllerImpl : AbstractPlayerController
     {
         // Debug.Log("OnScroll: " + context.ToString());
     }
+
+    protected override void OnGrenade(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+        {
+            return;
+        }
+
+        GameObject grenadePrefab = Resources.Load<GameObject>("prefabs/RGD-5");
+
+        if (grenadePrefab == null)
+        {
+            Debug.Log("Grenade prefab is null");
+            return;
+        }
+
+        // Получаем направление взгляда и вычисляем позицию для гранаты
+        Vector3 spawnPosition = playerCamera.transform.position + playerCamera.transform.forward * 0.5f;
+
+        GameObject grenade = Instantiate(grenadePrefab, spawnPosition, Quaternion.identity);
+        Rigidbody rb = grenade.GetComponent<Rigidbody>();
+        rb.AddForce(playerCamera.transform.forward * grenadeThrowForce, ForceMode.VelocityChange);
+    }
+
 
     protected override void OnLook(InputAction.CallbackContext context)
     {

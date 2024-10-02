@@ -13,11 +13,12 @@ public class BaseGrenade : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
     }
 
     private void Explode()
     {
         Debug.Log($"{nameof(Explode)}");
+
+        Destroy(gameObject);
     }
 }
