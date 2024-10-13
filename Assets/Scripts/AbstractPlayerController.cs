@@ -30,6 +30,7 @@ public abstract class AbstractPlayerController : MonoBehaviour
         m_controller.PlayerInput.Move.performed += OnMove;
         m_controller.PlayerInput.Move.canceled += OnMove;
         m_controller.PlayerInput.Reload.performed += OnReload;
+        m_controller.PlayerInput.Grenade.performed += OnGrenade;
         m_controller.PlayerInput.Run.canceled += OnRun;
         m_controller.PlayerInput.Run.performed += OnRun;
         m_controller.PlayerInput.Look.performed += OnLook;
@@ -61,6 +62,7 @@ public abstract class AbstractPlayerController : MonoBehaviour
         m_controller.PlayerInput.Move.performed -= OnMove;
         m_controller.PlayerInput.Move.canceled -= OnMove;
         m_controller.PlayerInput.Reload.performed -= OnReload;
+        m_controller.PlayerInput.Grenade.performed -= OnGrenade;
         m_controller.PlayerInput.Run.performed -= OnRun;
         m_controller.PlayerInput.Run.canceled -= OnRun;
         m_controller.PlayerInput.Look.performed -= OnLook;
@@ -144,4 +146,10 @@ public abstract class AbstractPlayerController : MonoBehaviour
     /// </summary>
     /// <param name="context"></param>
     abstract protected void OnScroll(InputAction.CallbackContext context);
+
+    /// <summary>
+    /// Абстрактная функция бросания гранаты
+    /// </summary>
+    /// <param name="context"></param>
+    abstract protected void OnGrenade(InputAction.CallbackContext context);
 }
