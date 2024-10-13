@@ -10,6 +10,8 @@ public class GunSystem : MonoBehaviour
     public uint magazineSize = 30;
     public uint bulletsPerShot = 1;
 
+    public GameObject bulletHole = null;
+
     // Floats
     public float shootingDelay = 0.1f;
     public float spread = 0.1f;
@@ -39,6 +41,8 @@ public class GunSystem : MonoBehaviour
     private void Start()
     {
         m_remainedBullets = magazineSize;
+
+        bulletHole = Resources.Load<GameObject>("Prefabs/BulletHoles/BulletHole_1");
     }
 
     public void PullTrigger()
@@ -89,6 +93,12 @@ public class GunSystem : MonoBehaviour
                 Debug.Log($"distance: {hitInfo.distance}");
                 Debug.DrawLine(fpsCamera.transform.position, hitInfo.point, Color.red, 30f);
 
+                // Сдвигаем точку появления префаба немного перед поверхностью
+                Vector3 bulletHolePosition = hitInfo.point + hitInfo.normal * 0.01f;
+
+                // Создаём префаб дырки от пули с нужной ориентацией
+                GameObject obj = Instantiate(bulletHole, bulletHolePosition, Quaternion.LookRotation(hitInfo.normal));
+
                 // TODO: нанести дамагарова
             }
         }
@@ -97,6 +107,7 @@ public class GunSystem : MonoBehaviour
             Debug.Log(e);
         }
     }
+
 
     private void HandleTriggerPulled()
     {
